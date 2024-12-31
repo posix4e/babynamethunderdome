@@ -1,4 +1,6 @@
 name: babynamethunderdome
+preview:
+  - sql-databases
 services:
   - basedir: ""
     match: services/*.ts
@@ -10,3 +12,8 @@ runtimes:
     dockerfile: ./deno.dockerfile
     context: ""
     args: {}
+resources:
+  databases:
+    auth:
+      type: postgres
+      description: Authentication database for storing user credentials

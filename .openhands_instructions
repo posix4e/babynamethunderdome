@@ -1,0 +1,25 @@
+# Repository Overview
+
+This repository contains baby name thunderdome. A simple deno app for parents to use pick baby names using friends and family.
+Parents choose names they like, then we send out an interface to our friends where they can pick between two names to help rank them.
+It stores all the data in a database and has it's own usernames and password database.
+
+## General Setup
+
+- **Formaqt command**: Use `deno fmt` to lint the project.
+- **Lint command**: Use `deno lint` to lint the project.
+- **Local start command**: Use `nitric start` to run the project locally
+- **Development environment setup**:
+  - Install Deno and Nitric
+
+## CI/CD Workflow
+
+The repository employs GitHub Actions to automate essential development tasks. 
+It has one file for CD on merging to origin/master and one CI for pushing a branch and PRing.
+
+## Project Structure
+
+- **Deno Services**: Located in the `services/` directory.
+
+## Development Guidelines
+

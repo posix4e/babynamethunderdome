@@ -1,20 +1,18 @@
-import { assertEquals } from "https://deno.land/std@0.208.0/assert/mod.ts";
+import { assertEquals, assertNotEquals } from "https://deno.land/std@0.208.0/assert/mod.ts";
 
-// Test data
-const TEST_USER = {
-  username: "testuser",
-  password: "testpass123",
-};
-
-// Test server URL
-const SERVER_URL = "http://localhost:8000";
+const API_URL = "http://localhost:4001";
 
 Deno.test("Authentication Flow", async (t) => {
+  const testUser = {
+    username: "testuser_" + Math.random().toString(36).substring(7),
+    password: "testpass123",
+  };
+
   await t.step("Register user", async () => {
-    const response = await fetch(`${SERVER_URL}/register`, {
+    const response = await fetch(`${API_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(TEST_USER),
+      body: JSON.stringify(testUser),
     });
 
     assertEquals(response.status, 201);
@@ -22,34 +20,64 @@ Deno.test("Authentication Flow", async (t) => {
     assertEquals(data.message, "User registered successfully");
   });
 
-  await t.step("Login user", async () => {
-    const response = await fetch(`${SERVER_URL}/login`, {
+  await t.step("Register duplicate user should fail", async () => {
+    const response = await fetch(`${API_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(TEST_USER),
+      body: JSON.stringify(testUser),
     });
 
-    assertEquals(response.status, 200);
+    assertEquals(response.status, 409);
     const data = await response.json();
-    assertEquals(typeof data.token, "string");
+    assertEquals(data.error, "Username already exists");
   });
 
-  await t.step("Access protected endpoint", async () => {
-    // First login to get token
-    const loginResponse = await fetch(`${SERVER_URL}/login`, {
+  await t.step("Login with valid credentials", async () => {
+    const response = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(TEST_USER),
-    });
-    const { token } = await loginResponse.json();
-
-    // Test protected endpoint
-    const response = await fetch(`${SERVER_URL}/protected`, {
-      headers: { "Authorization": `Bearer ${token}` },
+      body: JSON.stringify(testUser),
     });
 
     assertEquals(response.status, 200);
     const data = await response.json();
-    assertEquals(data.user, TEST_USER.username);
+    assertEquals(data.message, "Login successful");
+    assertNotEquals(data.user.id, undefined);
+    assertEquals(data.user.username, testUser.username);
+  });
+
+  await t.step("Login with invalid password", async () => {
+    const response = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: testUser.username,
+        password: "wrongpassword",
+      }),
+    });
+
+    assertEquals(response.status, 401);
+    const data = await response.json();
+    assertEquals(data.error, "Invalid username or password");
+  });
+
+  await t.step("Access protected endpoint with auth", async () => {
+    const response = await fetch(`${API_URL}/me`, {
+      headers: {
+        Authorization: `Bearer ${testUser.username}`,
+      },
+    });
+
+    assertEquals(response.status, 200);
+    const data = await response.json();
+    assertEquals(data.user.username, testUser.username);
+  });
+
+  await t.step("Access protected endpoint without auth", async () => {
+    const response = await fetch(`${API_URL}/me`);
+
+    assertEquals(response.status, 401);
+    const data = await response.json();
+    assertEquals(data.error, "Authentication required");
   });
 });

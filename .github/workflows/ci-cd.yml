@@ -15,7 +15,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.x
+          deno-version: v1.39.0
 
       - name: Check formatting
         run: deno fmt --check
@@ -37,7 +37,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.x
+          deno-version: v1.39.0
 
       # You'll need to configure deployment secrets in your repository settings
       - name: Deploy to staging

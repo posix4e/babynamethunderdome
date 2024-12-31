@@ -89,7 +89,7 @@ router.get("/protected", async (ctx) => {
       message: "Protected data",
       user: payload.username,
     };
-  } catch (error) {
+  } catch (_error) {
     ctx.response.status = 401;
     ctx.response.body = { error: "Invalid token" };
   }

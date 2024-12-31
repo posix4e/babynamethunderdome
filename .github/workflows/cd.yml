@@ -1,0 +1,48 @@
+
+name: Staging Nitric Install
+
+on:
+  push:
+    branches: 
+      - main
+  pull_request:
+
+jobs:
+  staging-install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Install Deno
+        run: |
+          # Using the official installation script
+          curl -fsSL https://deno.land/x/install/install.sh | sh
+          
+          # Add Deno to PATH for this session
+          echo "$HOME/.deno/bin" >> $GITHUB_PATH
+      
+      - name: Install Nitric CLI (Staging/Pre-Release)
+        run: |
+          # If you need a specific version or branch, 
+          # you can specify it like so (example: v0.10.0):
+          # deno install -A --unstable -f -n nitric https://deno.land/x/nitric@v0.10.0/cli.ts
+          
+          # If you have a custom staging build, replace the URL with your staging link,
+          # otherwise the "latest" from deno.land/x/nitric/cli.ts will install the main line:
+          deno install -A --unstable -f -n nitric https://deno.land/x/nitric/cli.ts
+          
+          # Verify install
+          nitric --version
+      
+      - name: Run Nitric build (example)
+        run: |
+          # Example staging step: build the project with Nitric
+          nitric build
+
+      - name: Run Nitric tests (example)
+        run: |
+          # Example staging step: run tests (integration, e2e, etc.)
+          # Adjust to your own test commands as needed
+          nitric test
+

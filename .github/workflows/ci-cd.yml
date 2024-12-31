@@ -23,8 +23,12 @@ jobs:
       - name: Lint
         run: deno lint
 
-      - name: Run tests
-        run: deno test
+      - name: Start server and run tests
+        run: |
+          deno run --allow-net main.ts &
+          sleep 2  # Wait for server to start
+          deno test --allow-net
+          kill %1  # Stop the server
 
   deploy-staging:
     needs: lint-test

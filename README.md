@@ -1,6 +1,7 @@
 # Deno Nitric Authentication Example
 
-This is a simple example of a Deno application with authentication using JWT tokens.
+This is a simple example of a Deno application with authentication using JWT
+tokens.
 
 ## Features
 
@@ -25,6 +26,7 @@ This is a simple example of a Deno application with authentication using JWT tok
 ## API Endpoints
 
 ### Register User
+
 ```http
 POST /register
 Content-Type: application/json
@@ -36,6 +38,7 @@ Content-Type: application/json
 ```
 
 ### Login
+
 ```http
 POST /login
 Content-Type: application/json
@@ -47,6 +50,7 @@ Content-Type: application/json
 ```
 
 ### Access Protected Route
+
 ```http
 GET /protected
 Authorization: Bearer your_jwt_token
@@ -60,7 +64,8 @@ deno test --allow-net test.ts
 
 ## Security Notes
 
-This is a basic example and includes several simplifications that should not be used in production:
+This is a basic example and includes several simplifications that should not be
+used in production:
 
 1. Uses in-memory storage instead of a proper database
 2. Has a hardcoded JWT secret

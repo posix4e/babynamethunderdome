@@ -2,16 +2,16 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   lint-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
@@ -30,10 +30,10 @@ jobs:
     needs: lint-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:

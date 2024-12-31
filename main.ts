@@ -1,6 +1,6 @@
 import { Application, Router } from "oak";
-import { create, verify, getNumericDate } from "djwt";
-import { hash, compare } from "bcrypt";
+import { create, getNumericDate, verify } from "djwt";
+import { compare, hash } from "bcrypt";
 
 // In-memory user storage (replace with a proper database in production)
 const users = new Map<string, { password: string }>();
@@ -67,7 +67,7 @@ router.post("/login", async (ctx) => {
   const token = await create(
     { alg: "HS256", typ: "JWT" },
     { username, exp: getNumericDate(60 * 60 * 24) }, // 24 hours expiry
-    key
+    key,
   );
 
   ctx.response.body = { token };
@@ -89,7 +89,7 @@ router.get("/protected", async (ctx) => {
       message: "Protected data",
       user: payload.username,
     };
-  } catch (error) {
+  } catch (_error) {
     ctx.response.status = 401;
     ctx.response.body = { error: "Invalid token" };
   }

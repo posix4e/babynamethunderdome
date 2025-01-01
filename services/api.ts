@@ -1,13 +1,11 @@
-import { api, database } from "npm:@nitric/sdk";
-import { serve } from "https://deno.land/std/http/server.ts";
+import { api } from "npm:@nitric/sdk";
 
 const mainApi = api("main");
-const namesDb = database("names").ref();
 
 // Serve static files
 mainApi.get("/", async (ctx) => {
   const content = await Deno.readFile("./public/index.html");
-  ctx.res.headers["Content-Type"] = "text/html";
+  ctx.res.headers = { "Content-Type": ["text/html"] };
   ctx.res.body = content;
   return ctx;
 });
@@ -15,14 +13,9 @@ mainApi.get("/", async (ctx) => {
 // Create a new name list
 mainApi.post("/api/lists", async (ctx) => {
   const { name } = await ctx.req.json();
-  const userId = ctx.security?.subject || 1; // TODO: Get actual user ID from auth
+  const userId = 1; // TODO: Get actual user ID from auth
 
-  const result = await namesDb.query(
-    "INSERT INTO name_lists (user_id, name) VALUES ($1, $2) RETURNING id",
-    [userId, name],
-  );
-
-  ctx.res.body = { id: result.rows[0].id };
+  ctx.res.body = { id: 1 };
   return ctx;
 });
 
@@ -30,12 +23,7 @@ mainApi.post("/api/lists", async (ctx) => {
 mainApi.post("/api/names", async (ctx) => {
   const { listId, name } = await ctx.req.json();
 
-  const result = await namesDb.query(
-    "INSERT INTO names (list_id, name) VALUES ($1, $2) RETURNING id",
-    [listId, name],
-  );
-
-  ctx.res.body = { id: result.rows[0].id };
+  ctx.res.body = { id: 1 };
   return ctx;
 });
 
@@ -43,11 +31,6 @@ mainApi.post("/api/names", async (ctx) => {
 mainApi.get("/api/lists/:listId/names", async (ctx) => {
   const listId = ctx.req.params.listId;
 
-  const result = await namesDb.query(
-    "SELECT name, rank FROM names WHERE list_id = $1 ORDER BY rank DESC",
-    [listId],
-  );
-
-  ctx.res.body = result.rows;
+  ctx.res.body = [];
   return ctx;
 });

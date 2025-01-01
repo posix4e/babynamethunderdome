@@ -6,7 +6,7 @@ const mainApi = api("main");
 Deno.test("Create name list", async () => {
   const ctx = {
     req: {
-      json: async () => ({ name: "Test List" }),
+      json: async () => await Promise.resolve({ name: "Test List" }),
     },
     res: {},
     security: { subject: 1 },
@@ -19,7 +19,7 @@ Deno.test("Create name list", async () => {
 Deno.test("Add name to list", async () => {
   const ctx = {
     req: {
-      json: async () => ({ listId: 1, name: "John" }),
+      json: async () => await Promise.resolve({ listId: 1, name: "John" }),
     },
     res: {},
   };

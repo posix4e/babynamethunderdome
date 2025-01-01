@@ -1,5 +1,4 @@
 import { api, database } from "npm:@nitric/sdk";
-import { serve } from "https://deno.land/std/http/server.ts";
 
 const mainApi = api("main");
 const namesDb = database("names").ref();

@@ -17,3 +17,6 @@ resources:
     auth:
       type: postgres
       description: Authentication database for storing user credentials
+    names:
+      type: postgres
+      description: Database for storing name lists and rankings

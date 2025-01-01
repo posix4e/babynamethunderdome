@@ -1,6 +1,6 @@
 # Baby Name Thunderdome
 
-A collaborative baby name selection platform built with Deno and Nitric. Help parents choose the
+A collaborative baby name selection platform. Help parents choose the
 perfect name through a fun and interactive voting system.
 
 ## Features
@@ -14,5 +14,5 @@ perfect name through a fun and interactive voting system.
 - **For Friends & Family**:
   - Easy-to-use voting interface
   - Compare names in head-to-head matchups
-  - No account required for voting
+  - No accounts required
   - Share feedback on name choices

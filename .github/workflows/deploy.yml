@@ -1,0 +1,60 @@
+name: Deploy Application
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          
+      - name: Generate systemd service file
+        run: |
+          cat << EOF | sudo tee /etc/systemd/system/babynamethunderdome.service
+          [Unit]
+          Description=Baby Name Thunderdome FastAPI Service
+          After=network.target
+
+          [Service]
+          User=$USER
+          Group=$USER
+          WorkingDirectory=$PWD
+          Environment=PATH=$PWD/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+          ExecStart=$PWD/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+          Restart=always
+          RestartSec=5
+          StartLimitIntervalSec=0
+
+          # Security hardening options
+          PrivateTmp=true
+          NoNewPrivileges=true
+          ProtectHome=read-only
+          ProtectSystem=full
+
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+        
+      - name: Start service
+        run: |
+          sudo systemctl daemon-reload
+          sudo systemctl enable babynamethunderdome
+          sudo systemctl restart babynamethunderdome
+        
+      - name: Check service status
+        run: |
+          sudo systemctl status babynamethunderdome
+          sleep 5  # Give the service a moment to start
+          curl -s http://localhost:8000 || echo "Service not responding on port 8000"

@@ -14,5 +14,5 @@ perfect name through a fun and interactive voting system.
 - **For Friends & Family**:
   - Easy-to-use voting interface
   - Compare names in head-to-head matchups
-  - No account required for voting
+  - No accounts required
   - Share feedback on name choices

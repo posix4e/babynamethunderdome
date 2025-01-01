@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baby Name Thunderdome</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .name-list {
+        margin: 20px 0;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .name-input {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .name-input input {
+        flex: 1;
+        padding: 5px;
+      }
+      button {
+        padding: 5px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .names-container {
+        margin-top: 20px;
+      }
+      .name-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px;
+        border-bottom: 1px solid #eee;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Baby Name Thunderdome</h1>
+    <div class="name-list">
+      <h2>Create New Name List</h2>
+      <div class="name-input">
+        <input type="text" id="listName" placeholder="List Name">
+        <button onclick="createList()">Create List</button>
+      </div>
+    </div>
+    <div class="name-list">
+      <h2>Add Names</h2>
+      <div class="name-input">
+        <input type="text" id="newName" placeholder="Enter a name">
+        <button onclick="addName()">Add Name</button>
+      </div>
+      <div class="names-container" id="namesList">
+        <!-- Names will be added here dynamically -->
+      </div>
+    </div>
+
+    <script>
+      let currentListId = null;
+
+      async function createList() {
+        const listName = document.getElementById("listName").value;
+        if (!listName) return;
+
+        try {
+          const response = await fetch("/api/lists", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: listName }),
+          });
+          const data = await response.json();
+          currentListId = data.id;
+          alert("List created successfully!");
+          document.getElementById("listName").value = "";
+        } catch (error) {
+          alert("Error creating list");
+        }
+      }
+
+      async function addName() {
+        if (!currentListId) {
+          alert("Please create a list first");
+          return;
+        }
+
+        const nameInput = document.getElementById("newName");
+        const name = nameInput.value;
+        if (!name) return;
+
+        try {
+          const response = await fetch("/api/names", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ listId: currentListId, name }),
+          });
+          const data = await response.json();
+          nameInput.value = "";
+          await loadNames();
+        } catch (error) {
+          alert("Error adding name");
+        }
+      }
+
+      async function loadNames() {
+        if (!currentListId) return;
+
+        try {
+          const response = await fetch(`/api/lists/${currentListId}/names`);
+          const names = await response.json();
+          const container = document.getElementById("namesList");
+          container.innerHTML = names.map((name) => `
+                    <div class="name-item">
+                        <span>${name.name}</span>
+                        <span>Rank: ${name.rank}</span>
+                    </div>
+                `).join("");
+        } catch (error) {
+          console.error("Error loading names");
+        }
+      }
+    </script>
+  </body>
+</html>

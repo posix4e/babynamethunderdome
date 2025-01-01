@@ -1,0 +1,16 @@
+CREATE TABLE name_lists (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+
+CREATE TABLE names (
+    id SERIAL PRIMARY KEY,
+    list_id INTEGER NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    rank INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (list_id) REFERENCES name_lists(id)
+);

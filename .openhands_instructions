@@ -1,25 +1,67 @@
 # Repository Overview
 
-This repository contains baby name thunderdome. A simple deno app for parents to use pick baby names using friends and family.
-Parents choose names they like, then we send out an interface to our friends where they can pick between two names to help rank them.
-It stores all the data in a database and has it's own usernames and password database.
+This repository contains Baby Name Thunderdome, a Deno application that helps parents choose baby names through collaborative voting. The application allows:
+- Parents to input and manage their preferred baby names
+- Friends and family to participate in name selection through a simple voting interface
+- Secure user authentication and data storage
+- Easy deployment and management through Nitric
 
-## General Setup
+## Development Environment Setup
 
-- **Formaqt command**: Use `deno fmt` to lint the project.
-- **Lint command**: Use `deno lint` to lint the project.
-- **Local start command**: Use `nitric start` to run the project locally
-- **Development environment setup**:
-  - Install Deno and Nitric
+1. **Required Tools**:
+   - Deno (v2.1.4 or later)
+   - Node.js (v18.x or later)
+   - Nitric CLI (v0.1.0 or later)
 
-## CI/CD Workflow
+2. **Installation Commands**:
+   ```bash
+   # Install Deno
+   curl -fsSL https://deno.land/x/install/install.sh | sh
 
-The repository employs GitHub Actions to automate essential development tasks. 
-It has one file for CD on merging to origin/master and one CI for pushing a branch and PRing.
+   # Install Node.js using nvm (recommended)
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+   nvm install 18
+   nvm use 18
+
+   # Install Nitric CLI
+   npm install -g @nitric/cli
+   ```
+
+3. **Development Commands**:
+   - **Format code**: `deno fmt`
+   - **Lint code**: `deno lint`
+   - **Start locally**: `nitric start`
 
 ## Project Structure
 
-- **Deno Services**: Located in the `services/` directory.
+- **Services Directory**: Located in `services/`
+  - Contains the core Deno application services
+  - Includes authentication and data management logic
+
+## CI/CD Workflow
+
+The repository uses GitHub Actions for automated development workflows:
+1. **Continuous Integration (CI)**:
+   - Triggered on branch pushes and pull requests
+   - Runs formatting and linting checks
+   - Executes test suite
+
+2. **Continuous Deployment (CD)**:
+   - Triggered on merges to origin/master
+   - Handles automated deployment process
 
 ## Development Guidelines
 
+1. **Code Quality**:
+   - Run `deno fmt` before committing changes
+   - Ensure all code passes `deno lint`
+   - Follow Deno's style guide and best practices
+
+2. **Testing**:
+   - Write tests for new features
+   - Ensure existing tests pass before submitting PRs
+
+3. **Security**:
+   - Follow secure coding practices
+   - Properly handle user authentication and data
+   - Use environment variables for sensitive information

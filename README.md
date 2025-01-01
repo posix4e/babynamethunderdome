@@ -1,81 +1,140 @@
-# Deno Nitric Authentication Example
+# Baby Name Thunderdome
 
-This is a simple example of a Deno application with authentication using JWT tokens.
+A collaborative baby name selection platform built with Deno and Nitric. Help parents choose the
+perfect name through a fun and interactive voting system.
 
 ## Features
 
-- User registration
-- User login with JWT token generation
-- Protected routes using JWT authentication
-- In-memory user storage (can be replaced with a database)
+- **For Parents**:
+  - Create and manage lists of potential baby names
+  - Invite friends and family to participate in name selection
+  - View voting results and rankings
+  - Secure account management
+
+- **For Friends & Family**:
+  - Easy-to-use voting interface
+  - Compare names in head-to-head matchups
+  - No account required for voting
+  - Share feedback on name choices
+
+- **Technical Features**:
+  - Secure user authentication with JWT
+  - Persistent data storage
+  - RESTful API design
+  - Rate limiting and security measures
 
 ## Prerequisites
 
-- Deno installed on your system
+1. **Required Tools**:
+   - Deno v2.1.4 or later
+   - Node.js v18.x or later
+   - Nitric CLI v0.1.0 or later
 
-## Running the Application
-
-1. Start the server:
+2. **Installation**:
    ```bash
-   deno task dev
+   # Install Deno
+   curl -fsSL https://deno.land/x/install/install.sh | sh
+
+   # Install Node.js (using nvm)
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+   nvm install 18
+   nvm use 18
+
+   # Install Nitric CLI
+   npm install -g @nitric/cli
    ```
 
-2. The server will run on http://localhost:8000
+## Development
+
+1. **Start the Development Server**:
+   ```bash
+   nitric start
+   ```
+   The server will be available at http://localhost:8000
+
+2. **Code Formatting**:
+   ```bash
+   deno fmt
+   ```
+
+3. **Linting**:
+   ```bash
+   deno lint
+   ```
 
 ## API Endpoints
 
-### Register User
+### Authentication
 
 ```http
-POST /register
+# Register New Parent Account
+POST /auth/register
 Content-Type: application/json
-
 {
-  "username": "your_username",
-  "password": "your_password"
+  "email": "parent@example.com",
+  "password": "secure_password",
+  "name": "Parent Name"
+}
+
+# Login
+POST /auth/login
+Content-Type: application/json
+{
+  "email": "parent@example.com",
+  "password": "secure_password"
 }
 ```
 
-### Login
+### Name Management
 
 ```http
-POST /login
+# Add Names to List
+POST /names
+Authorization: Bearer <token>
 Content-Type: application/json
-
 {
-  "username": "your_username",
-  "password": "your_password"
+  "names": ["Name1", "Name2", "Name3"]
+}
+
+# Get Voting Results
+GET /names/results
+Authorization: Bearer <token>
+```
+
+### Voting
+
+```http
+# Get Name Pair for Voting
+GET /vote/<voting_id>
+
+# Submit Vote
+POST /vote/<voting_id>
+Content-Type: application/json
+{
+  "winner": "Name1",
+  "loser": "Name2"
 }
 ```
 
-### Access Protected Route
+## Contributing
 
-```http
-GET /protected
-Authorization: Bearer your_jwt_token
-```
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+   - Follow the code style guidelines
+   - Add tests for new features
+   - Run existing tests
+4. Submit a pull request
 
-## Running Tests
+## Security Considerations
 
-```bash
-deno test --allow-net test.ts
-```
+- All endpoints require appropriate authentication
+- Rate limiting is implemented on all routes
+- Input validation and sanitization
+- Secure password hashing
+- HTTPS required in production
+- Environment-based configuration
 
-## Security Notes
+## License
 
-This is a basic example and includes several simplifications that should not be used in production:
-
-1. Uses in-memory storage instead of a proper database
-2. Has a hardcoded JWT secret
-3. Lacks input validation and rate limiting
-4. Missing proper error handling
-
-For production use, make sure to:
-
-1. Use a proper database
-2. Implement secure secret management
-3. Add input validation
-4. Implement rate limiting
-5. Add proper error handling
-6. Use HTTPS
-7. Implement password complexity requirements
+[MIT License](LICENSE)

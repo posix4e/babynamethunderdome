@@ -31,6 +31,7 @@
     - name: Launch server in the background
       shell: |
         cd {{ project_dir }}
+        export NEW_RELIC_LICENSE_KEY="{{ lookup('env', 'NEW_RELIC_LICENSE_KEY') | default('') }}"
         nohup ./venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 > uvicorn.log 2>&1 &
       async: 0
       poll: 0

@@ -1,3 +1,10 @@
+import os
+import newrelic.agent
+
+# Initialize New Relic
+if os.getenv('NEW_RELIC_LICENSE_KEY'):
+    newrelic.agent.initialize('app/newrelic.ini')
+
 from fastapi import FastAPI, Request, Form, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -9,6 +16,7 @@ from sqlalchemy.orm import Session
 from . import database
 
 app = FastAPI()
+app = newrelic.agent.WSGIApplicationWrapper(app)
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")

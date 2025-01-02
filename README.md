@@ -41,10 +41,17 @@ A collaborative baby name selection platform that helps parents choose the perfe
   python -m pytest tests/
   ```
 
+- **New Relic Monitoring**
+  The application is integrated with New Relic for performance monitoring. To enable it:
+  1. Set the `NEW_RELIC_LICENSE_KEY` environment variable with your New Relic license key
+  2. The New Relic agent will automatically start monitoring when the application runs
+  3. Configuration can be adjusted in `app/newrelic.ini`
+
 - **Project Structure**
   - `app/main.py` - Main application code
   - `app/static/` - Static assets (CSS, JS)
   - `app/templates/` - HTML templates
+  - `app/newrelic.ini` - New Relic configuration
   - `tests/` - Test suite
   - `requirements.txt` - Python dependencies
   - `*.yml/.j2` - Deployment and configuration files

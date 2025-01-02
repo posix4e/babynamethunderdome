@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Baby Name Thunderdome</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .name-list {
+            margin: 20px 0;
+        }
+        .name-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Baby Name Thunderdome</h1>
+    
+    <div id="session-controls">
+        <button onclick="createSession()">Create New Session</button>
+        <div id="session-info" style="display: none;">
+            Share this link: <span id="session-link"></span>
+        </div>
+    </div>
+
+    <div id="name-controls" style="display: none;">
+        <h2>Add Names</h2>
+        <input type="text" id="new-name" placeholder="Enter a name">
+        <button onclick="addName()">Add Name</button>
+
+        <div class="name-list" id="names-container">
+        </div>
+    </div>
+
+    <script>
+        let currentSession = null;
+
+        async function createSession() {
+            const response = await fetch('/create-session', {
+                method: 'POST'
+            });
+            const data = await response.json();
+            currentSession = data.session_id;
+            document.getElementById('session-link').textContent = window.location.origin + '?session=' + currentSession;
+            document.getElementById('session-info').style.display = 'block';
+            document.getElementById('name-controls').style.display = 'block';
+            loadNames();
+        }
+
+        async function addName() {
+            const nameInput = document.getElementById('new-name');
+            const name = nameInput.value.trim();
+            if (!name) return;
+
+            const formData = new FormData();
+            formData.append('name', name);
+
+            await fetch(`/add-name/${currentSession}`, {
+                method: 'POST',
+                body: formData
+            });
+            nameInput.value = '';
+            loadNames();
+        }
+
+        async function vote(name) {
+            await fetch(`/vote/${currentSession}/${name}`, {
+                method: 'POST'
+            });
+            loadNames();
+        }
+
+        async function loadNames() {
+            const response = await fetch(`/names/${currentSession}`);
+            const data = await response.json();
+            const container = document.getElementById('names-container');
+            container.innerHTML = '';
+            
+            data.names.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'name-item';
+                div.innerHTML = `
+                    <span>${item.name}</span>
+                    <span>
+                        Votes: ${item.votes}
+                        <button onclick="vote('${item.name}')">Vote</button>
+                    </span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Check for session in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session');
+        if (sessionId) {
+            currentSession = sessionId;
+            document.getElementById('name-controls').style.display = 'block';
+            loadNames();
+        }
+    </script>
+</body>
+</html>

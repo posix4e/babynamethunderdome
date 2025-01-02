@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Baby Name Vote</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { 
             font-family: Arial, sans-serif;
@@ -28,6 +29,17 @@
         .voter-info {
             margin-bottom: 20px;
         }
+        #share-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #share-button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -37,6 +49,7 @@
         <input type="text" id="voter-name" placeholder="Your Name">
         <input type="number" id="voter-age" placeholder="Your Age">
         <button onclick="saveVoterInfo()">Save Info</button>
+        <button onclick="shareVotingLink()" id="share-button" style="margin-left: 10px;">Share</button>
     </div>
 
     <div id="comparison-container" class="comparison-container">
@@ -103,6 +116,36 @@
             currentSession = sessionId;
         } else {
             document.body.innerHTML = '<h1>Error: No session provided</h1>';
+        }
+
+        async function shareVotingLink() {
+            const shareUrl = window.location.href;
+            const shareTitle = 'Help me choose a baby name!';
+            const shareText = 'Please vote on baby names and help us decide!';
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: shareTitle,
+                        text: shareText,
+                        url: shareUrl
+                    });
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.error('Error sharing:', err);
+                        alert('Failed to share. You can copy the URL manually.');
+                    }
+                }
+            } else {
+                // Fallback for browsers that don't support the Web Share API
+                try {
+                    await navigator.clipboard.writeText(shareUrl);
+                    alert('Link copied to clipboard!');
+                } catch (err) {
+                    console.error('Failed to copy:', err);
+                    alert('Please copy the URL from your browser\'s address bar.');
+                }
+            }
         }
     </script>
 </body>

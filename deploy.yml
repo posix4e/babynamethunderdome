@@ -2,12 +2,29 @@
 - name: Deploy App
   hosts: localhost
   connection: local
-  gather_facts: false
+  gather_facts: true
 
   vars:
-    project_dir: /home/posix4e/babynamethunderdome
+    deployment_date: "{{ ansible_date_time.date }}"
+    deployment_id: "{{ lookup('env', 'GITHUB_RUN_ID') | default(ansible_date_time.epoch) }}"
+    project_dir: "/tmp/deploy/{{ deployment_date }}/bntd/{{ deployment_id }}"
 
   tasks:
+    - name: Create deployment directory
+      file:
+        path: "{{ project_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Sync code to deployment directory
+      synchronize:
+        src: "{{ playbook_dir }}/"
+        dest: "{{ project_dir }}"
+        rsync_opts:
+          - "--exclude=.git"
+          - "--exclude=venv"
+          - "--exclude=__pycache__"
+
     - name: Ensure the virtualenv package is installed (Debian/Ubuntu)
       apt:
         name: python3-virtualenv

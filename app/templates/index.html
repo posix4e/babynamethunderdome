@@ -15,9 +15,65 @@
         .name-item {
             display: flex;
             justify-content: space-between;
-            padding: 10px;
+            padding: 15px;
             border: 1px solid #ddd;
-            margin: 5px 0;
+            margin: 8px 0;
+            border-radius: 6px;
+            background-color: #fff;
+            transition: all 0.2s ease;
+        }
+        .name-item:hover {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input[type="text"] {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 200px;
+        }
+        .share-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .share-link span {
+            flex-grow: 1;
+            font-family: monospace;
+            padding: 8px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .copy-button {
+            background-color: #28a745;
+            white-space: nowrap;
+        }
+        .copy-button:hover {
+            background-color: #218838;
+        }
+        .copied-message {
+            color: #28a745;
+            display: none;
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -27,8 +83,20 @@
     <div id="session-controls">
         <button onclick="createSession()">Create New Session</button>
         <div id="session-info" style="display: none;">
-            Share this link: <span id="session-link"></span><br>
-            Share voting link: <span id="vote-link"></span>
+            <div class="share-link">
+                <span id="session-link"></span>
+                <button class="copy-button" onclick="copyLink('session-link')">
+                    Copy Admin Link
+                </button>
+                <span class="copied-message" id="session-copied">Copied!</span>
+            </div>
+            <div class="share-link">
+                <span id="vote-link"></span>
+                <button class="copy-button" onclick="copyLink('vote-link')">
+                    Copy Voting Link
+                </button>
+                <span class="copied-message" id="vote-copied">Copied!</span>
+            </div>
         </div>
     </div>
 
@@ -50,11 +118,29 @@
             });
             const data = await response.json();
             currentSession = data.session_id;
-            document.getElementById('session-link').textContent = window.location.origin + '?session=' + currentSession;
-            document.getElementById('vote-link').textContent = window.location.origin + '/vote-page?session=' + currentSession;
+            const adminUrl = window.location.origin + '?session=' + currentSession;
+            const voteUrl = window.location.origin + '/vote-page?session=' + currentSession;
+            document.getElementById('session-link').textContent = adminUrl;
+            document.getElementById('vote-link').textContent = voteUrl;
             document.getElementById('session-info').style.display = 'block';
             document.getElementById('name-controls').style.display = 'block';
             loadNames();
+        }
+
+        async function copyLink(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            try {
+                await navigator.clipboard.writeText(text);
+                const messageId = elementId === 'session-link' ? 'session-copied' : 'vote-copied';
+                const message = document.getElementById(messageId);
+                message.style.display = 'inline';
+                setTimeout(() => {
+                    message.style.display = 'none';
+                }, 2000);
+            } catch (err) {
+                alert('Failed to copy link. Please copy it manually by selecting the text.');
+            }
         }
 
         async function addName() {

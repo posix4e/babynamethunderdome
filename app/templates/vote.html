@@ -13,20 +13,69 @@
             display: flex;
             justify-content: space-around;
             margin: 20px 0;
+            gap: 20px;
         }
         .name-option {
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 30px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
             cursor: pointer;
             text-align: center;
-            width: 200px;
+            width: 250px;
+            font-size: 24px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .name-option:hover {
             background-color: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            border-color: #999;
+        }
+        .name-option:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .voter-info {
             margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        input[type="text"], input[type="number"] {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .share-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 20px;
+            background-color: #28a745;
+        }
+        .share-button:hover {
+            background-color: #218838;
+        }
+        .copied-message {
+            color: #28a745;
+            display: none;
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -40,13 +89,18 @@
     </div>
 
     <div id="comparison-container" class="comparison-container">
-        <div class="name-option" id="name1" onclick="vote(0)">
+        <div class="name-option" id="name1" onclick="vote(0)" role="button" tabindex="0" onkeypress="handleKeyPress(event, 0)">
             Loading...
         </div>
-        <div class="name-option" id="name2" onclick="vote(1)">
+        <div class="name-option" id="name2" onclick="vote(1)" role="button" tabindex="0" onkeypress="handleKeyPress(event, 1)">
             Loading...
         </div>
     </div>
+
+    <button class="share-button" onclick="shareComparison()">
+        Share this comparison
+        <span id="copied-message" class="copied-message">Link copied!</span>
+    </button>
 
     <script>
         let currentSession = null;
@@ -94,6 +148,27 @@
                 body: JSON.stringify(voterInfo)
             });
             loadNextComparison();
+        }
+
+        function handleKeyPress(event, index) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                vote(index);
+            }
+        }
+
+        async function shareComparison() {
+            const url = window.location.href;
+            try {
+                await navigator.clipboard.writeText(url);
+                const message = document.getElementById('copied-message');
+                message.style.display = 'inline';
+                setTimeout(() => {
+                    message.style.display = 'none';
+                }, 2000);
+            } catch (err) {
+                alert('Failed to copy link. Please copy it manually from your browser\'s address bar.');
+            }
         }
 
         // Check for session in URL

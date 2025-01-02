@@ -2,3 +2,5 @@ dist/
 .npmrc
 git.store
 server.log
+__pycache__
+*.swp

@@ -1,0 +1,62 @@
+---
+- name: Deploy Baby Name Thunderdome
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  
+  tasks:
+    - name: Create Python virtual environment
+      command: python -m venv venv
+      args:
+        creates: venv
+
+    - name: Install dependencies
+      pip:
+        requirements: requirements.txt
+        virtualenv: venv
+        state: present
+
+    - name: Create systemd service file
+      copy:
+        dest: /etc/systemd/system/babynamethunderdome.service
+        content: |
+          [Unit]
+          Description=Baby Name Thunderdome Web Application
+          After=network.target
+
+          [Service]
+          Type=simple
+          WorkingDirectory={{ ansible_env.PWD }}
+          Environment=PATH={{ ansible_env.PWD }}/venv/bin:{{ ansible_env.PATH }}
+          ExecStart={{ ansible_env.PWD }}/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+      become: yes
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+      become: yes
+
+    - name: Start and enable babynamethunderdome service
+      systemd:
+        name: babynamethunderdome
+        state: restarted
+        enabled: yes
+      become: yes
+
+    - name: Wait for service to start
+      wait_for:
+        port: 8000
+        timeout: 30
+
+    - name: Check service health
+      uri:
+        url: http://localhost:8000
+        return_content: yes
+      register: health_check
+      retries: 3
+      delay: 5
+      until: health_check.status == 200

@@ -11,3 +11,4 @@ newrelic
 pytest
 pytest-asyncio
 black
+bs4

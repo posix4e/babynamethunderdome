@@ -47,7 +47,7 @@ A collaborative baby name selection platform that helps parents choose the perfe
   - `app/templates/` - HTML templates
   - `tests/` - Test suite
   - `requirements.txt` - Python dependencies
-  - `*.yml` - Deployment and configuration files
+  - `*.yml/.j2` - Deployment and configuration files
 
 ## Contributing
 

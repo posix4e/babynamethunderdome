@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Baby Name Vote</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .comparison-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .name-option {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            width: 200px;
+        }
+        .name-option:hover {
+            background-color: #f0f0f0;
+        }
+        .voter-info {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Baby Name Vote</h1>
+    
+    <div class="voter-info">
+        <input type="text" id="voter-name" placeholder="Your Name">
+        <input type="number" id="voter-age" placeholder="Your Age">
+        <button onclick="saveVoterInfo()">Save Info</button>
+    </div>
+
+    <div id="comparison-container" class="comparison-container">
+        <div class="name-option" id="name1" onclick="vote(0)">
+            Loading...
+        </div>
+        <div class="name-option" id="name2" onclick="vote(1)">
+            Loading...
+        </div>
+    </div>
+
+    <script>
+        let currentSession = null;
+        let currentNames = null;
+        let voterInfo = null;
+
+        function saveVoterInfo() {
+            const name = document.getElementById('voter-name').value.trim();
+            const age = document.getElementById('voter-age').value;
+            if (!name || !age) {
+                alert('Please provide both name and age');
+                return;
+            }
+            voterInfo = { name, age };
+            loadNextComparison();
+        }
+
+        async function loadNextComparison() {
+            if (!voterInfo) {
+                alert('Please provide your information first');
+                return;
+            }
+            const response = await fetch(`/get-comparison/${currentSession}`);
+            const data = await response.json();
+            if (data.error) {
+                document.getElementById('comparison-container').innerHTML = '<p>No more names to compare!</p>';
+                return;
+            }
+            currentNames = data.names;
+            document.getElementById('name1').textContent = currentNames[0];
+            document.getElementById('name2').textContent = currentNames[1];
+        }
+
+        async function vote(index) {
+            if (!voterInfo) {
+                alert('Please provide your information first');
+                return;
+            }
+            const selectedName = currentNames[index];
+            await fetch(`/compare-vote/${currentSession}/${selectedName}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(voterInfo)
+            });
+            loadNextComparison();
+        }
+
+        // Check for session in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session');
+        if (sessionId) {
+            currentSession = sessionId;
+        } else {
+            document.body.innerHTML = '<h1>Error: No session provided</h1>';
+        }
+    </script>
+</body>
+</html>

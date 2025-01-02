@@ -29,14 +29,15 @@ def test_add_name():
     assert names[0]["votes"] == 0
 
 
-def test_vote():
+def test_compare_vote():
     # Create a session and add a name
     session_response = client.post("/create-session")
     session_id = session_response.json()["session_id"]
     client.post(f"/add-name/{session_id}", data={"name": "Bob"})
 
-    # Vote for the name
-    response = client.post(f"/vote/{session_id}/Bob")
+    # Vote for the name with voter info
+    voter_info = {"name": "John", "age": 30}
+    response = client.post(f"/compare-vote/{session_id}/Bob", json=voter_info)
     assert response.status_code == 200
     assert response.json()["success"] is True
 
@@ -45,3 +46,6 @@ def test_vote():
     names = names_response.json()["names"]
     assert names[0]["name"] == "Bob"
     assert names[0]["votes"] == 1
+    assert len(names[0]["voters"]) == 1
+    assert names[0]["voters"][0]["voter_name"] == "John"
+    assert names[0]["voters"][0]["voter_age"] == 30

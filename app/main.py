@@ -1,20 +1,20 @@
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Dict, Optional
 import uuid
 import random
+from sqlalchemy.orm import Session
+from . import database
 
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
-# In-memory storage (replace with database in production)
-baby_names = {}  # session_id -> list of names
-votes = {}  # name_id -> list of votes
-compared_pairs = {}  # session_id -> set of compared name pairs
+# Initialize database
+database.init_db()
 
 
 class NameSession(BaseModel):
@@ -36,53 +36,66 @@ async def vote_page(request: Request):
 
 
 @app.post("/create-session")
-async def create_session():
+async def create_session(db: Session = Depends(database.get_db)):
     session_id = str(uuid.uuid4())
-    baby_names[session_id] = []
+    db_session = database.Session(id=session_id)
+    db.add(db_session)
+    db.commit()
     return {"session_id": session_id}
 
 
 @app.post("/add-name/{session_id}")
-async def add_name(session_id: str, name: str = Form(...)):
-    if session_id not in baby_names:
+async def add_name(session_id: str, name: str = Form(...), db: Session = Depends(database.get_db)):
+    db_session = db.query(database.Session).filter(database.Session.id == session_id).first()
+    if not db_session:
         return {"error": "Session not found"}
+    
     name_id = f"{session_id}_{name}"
-    baby_names[session_id].append(name)
-    votes[name_id] = []
+    db_name = database.Name(id=name_id, session_id=session_id, name=name)
+    db.add(db_name)
+    db.commit()
     return {"success": True}
 
 
 @app.get("/names/{session_id}")
-async def get_names(session_id: str):
-    if session_id not in baby_names:
+async def get_names(session_id: str, db: Session = Depends(database.get_db)):
+    db_session = db.query(database.Session).filter(database.Session.id == session_id).first()
+    if not db_session:
         return {"error": "Session not found"}
+    
     names_with_votes = []
-    for name in baby_names[session_id]:
-        name_id = f"{session_id}_{name}"
-        vote_list = votes.get(name_id, [])
+    db_names = db.query(database.Name).filter(database.Name.session_id == session_id).all()
+    
+    for db_name in db_names:
+        votes = db.query(database.Vote).filter(database.Vote.name_id == db_name.id).all()
         names_with_votes.append({
-            "name": name,
-            "votes": len(vote_list),
-            "voters": vote_list
+            "name": db_name.name,
+            "votes": len(votes),
+            "voters": [vote.voter_info for vote in votes]
         })
+    
     return {"names": names_with_votes}
 
 
 @app.get("/get-comparison/{session_id}")
-async def get_comparison(session_id: str):
-    if session_id not in baby_names or len(baby_names[session_id]) < 2:
+async def get_comparison(session_id: str, db: Session = Depends(database.get_db)):
+    db_names = db.query(database.Name).filter(database.Name.session_id == session_id).all()
+    if len(db_names) < 2:
         return {"error": "Not enough names for comparison"}
     
-    if session_id not in compared_pairs:
-        compared_pairs[session_id] = set()
+    # Get all compared pairs
+    compared = db.query(database.ComparedPair).filter(
+        database.ComparedPair.session_id == session_id
+    ).all()
+    compared_set = {(pair.name1, pair.name2) for pair in compared}
     
     # Get all possible pairs
-    all_names = baby_names[session_id]
+    all_names = [n.name for n in db_names]
     possible_pairs = []
     for i in range(len(all_names)):
         for j in range(i + 1, len(all_names)):
             pair = tuple(sorted([all_names[i], all_names[j]]))
-            if pair not in compared_pairs[session_id]:
+            if pair not in compared_set:
                 possible_pairs.append([all_names[i], all_names[j]])
     
     if not possible_pairs:
@@ -92,26 +105,39 @@ async def get_comparison(session_id: str):
     selected_pair = random.choice(possible_pairs)
     return {"names": selected_pair}
 
+
 @app.post("/compare-vote/{session_id}/{name}")
-async def compare_vote(session_id: str, name: str, voter_info: VoterInfo):
-    if session_id not in baby_names:
+async def compare_vote(
+    session_id: str, name: str, voter_info: VoterInfo, db: Session = Depends(database.get_db)
+):
+    db_session = db.query(database.Session).filter(database.Session.id == session_id).first()
+    if not db_session:
         return {"error": "Session not found"}
     
     name_id = f"{session_id}_{name}"
-    if name_id not in votes:
-        votes[name_id] = []
     
     # Store vote with voter information
-    votes[name_id].append({
-        "voter_name": voter_info.name,
-        "voter_age": voter_info.age
-    })
+    vote = database.Vote(
+        name_id=name_id,
+        voter_info={"voter_name": voter_info.name, "voter_age": voter_info.age}
+    )
+    db.add(vote)
     
-    # Update compared pairs
-    names = baby_names[session_id]
-    current_comparison = [n for n in names if f"{session_id}_{n}" != name_id]
-    if current_comparison:
-        pair = tuple(sorted([name, current_comparison[0]]))
-        compared_pairs[session_id].add(pair)
+    # Get the other name in the comparison
+    other_name = db.query(database.Name).filter(
+        database.Name.session_id == session_id,
+        database.Name.id != name_id
+    ).first()
     
+    if other_name:
+        # Store the compared pair
+        name1, name2 = sorted([name, other_name.name])
+        compared = database.ComparedPair(
+            session_id=session_id,
+            name1=name1,
+            name2=name2
+        )
+        db.add(compared)
+    
+    db.commit()
     return {"success": True}

@@ -7,4 +7,5 @@ httpx
 
 # Dev
 pytest
+pytest-asyncio
 black

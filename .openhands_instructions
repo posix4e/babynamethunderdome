@@ -5,5 +5,6 @@ This repository contains Baby Name Thunderdome, a application that helps parents
 - Friends and family to participate in name selection through a simple voting interface
 - Since none of the data is private, the authentication model should be about making it easy to share links instead of a ton of usernames and passwords
 - it's a simple python program and you can learn more about it by reading the github actions
+- Never directly try to edit github workflows, it wont let you push branches that way. just plop the changed workflow into the root of the directory
 
 

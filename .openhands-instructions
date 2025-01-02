@@ -1,0 +1,64 @@
+# OpenHands Instructions for Baby Name Thunderdome
+
+## Repository Overview
+
+Baby Name Thunderdome is a Python web application that helps parents choose baby names through collaborative voting. Key aspects:
+
+- Built with Python and Flask
+- Simple authentication model based on shareable links
+- Uses SQLite for data storage
+- Deployed using GitHub Actions
+
+## Development Guidelines
+
+1. **Code Changes**
+   - All Python code changes must include corresponding tests in the `tests/` directory
+   - Follow PEP 8 style guidelines
+   - Maintain existing code structure and patterns
+
+2. **Documentation**
+   - Keep README.md up to date with any new features or changes
+   - Document any new configuration options
+   - Include setup instructions for new dependencies
+
+3. **Testing**
+   - Run `python -m pytest tests/` before submitting changes
+   - Add tests for new features and bug fixes
+   - Ensure all tests pass before committing
+
+4. **Deployment**
+   - Do not edit GitHub workflow files directly
+   - Place any workflow changes in the root directory
+   - Test deployment changes in a staging environment first
+
+5. **Security**
+   - Do not commit sensitive information
+   - Use environment variables for configuration
+   - Keep dependencies updated
+
+## File Structure
+
+- `app/main.py` - Core application logic
+- `app/static/` - Frontend assets
+- `app/templates/` - HTML templates
+- `tests/` - Test suite
+- `*.yml` - Configuration files
+- `requirements.txt` - Python dependencies
+
+## Common Tasks
+
+1. **Adding New Features**
+   - Create tests first
+   - Implement the feature
+   - Update documentation
+   - Run test suite
+
+2. **Bug Fixes**
+   - Reproduce the issue with a test
+   - Fix the bug
+   - Verify the test passes
+
+3. **Documentation Updates**
+   - Keep README.md current
+   - Update inline documentation
+   - Document configuration changes

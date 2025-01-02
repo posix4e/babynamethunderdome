@@ -4,3 +4,5 @@ git.store
 server.log
 __pycache__
 *.swp
+venv
+uvicorn.log

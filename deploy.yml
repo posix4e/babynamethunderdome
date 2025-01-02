@@ -1,0 +1,52 @@
+---
+- name: Deploy App
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    project_dir: /home/posix4e/babynamethunderdome
+
+  tasks:
+    - name: Ensure the virtualenv package is installed (Debian/Ubuntu)
+      apt:
+        name: python3-virtualenv
+        state: present
+      become: yes
+
+    - name: Create venv (using virtualenv)
+      command: virtualenv venv
+      args:
+        chdir: "{{ project_dir }}"
+        creates: "{{ project_dir }}/venv/bin/activate"
+
+    - name: Install Python dependencies
+      pip:
+        requirements: "{{ project_dir }}/requirements.txt"
+        virtualenv: "{{ project_dir }}/venv"
+        # Tells Ansible to use the `virtualenv` command
+        virtualenv_command: "virtualenv"
+        state: present
+
+    - name: Launch server in the background
+      shell: |
+        cd {{ project_dir }}
+        nohup ./venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 > uvicorn.log 2>&1 &
+      async: 0
+      poll: 0
+
+    - name: Wait for Uvicorn to be up
+      wait_for:
+        host: 127.0.0.1
+        port: 8000
+        timeout: 30
+
+    - name: Check health endpoint
+      uri:
+        url: http://127.0.0.1:8000
+        return_content: yes
+      register: health_check
+      retries: 3
+      delay: 5
+      until: health_check.status == 200
+

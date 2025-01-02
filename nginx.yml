@@ -1,0 +1,45 @@
+---
+- name: Configure Nginx for Baby Name Thunderdome
+  hosts: localhost
+  become: yes
+  gather_facts: false
+
+  vars:
+    my_domain: "babynamethunderdome.com"
+    project_path: "/home/posix4e/babynamethunderdome"
+
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Copy our custom Nginx config
+      template:
+        src: mysite.conf.j2
+        dest: /etc/nginx/sites-available/mysite.conf
+      notify:
+        - Reload Nginx
+
+    - name: Disable default site (optional)
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify:
+        - Reload Nginx
+
+    - name: Enable our site
+      file:
+        src: /etc/nginx/sites-available/mysite.conf
+        dest: /etc/nginx/sites-enabled/mysite.conf
+        state: link
+      notify:
+        - Reload Nginx
+
+  handlers:
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded
+

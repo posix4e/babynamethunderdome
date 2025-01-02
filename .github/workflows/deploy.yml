@@ -12,17 +12,15 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: '3.11'
           
-      - name: Install dependencies
+      - name: Install Ansible
         run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
-          nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 &
-        
-      - name: Check service status
+          pip install --upgrade pip
+          python -m pip install ansible
+
+      - name: Run Ansible playbook
         run: |
-          sudo systemctl status babynamethunderdome
-          sleep 5  # Give the service a moment to start
-          curl -s http://localhost:8000 || echo broke
+          ansible-playbook -i localhost, deploy.yml
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False

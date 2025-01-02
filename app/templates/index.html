@@ -73,12 +73,6 @@
             loadNames();
         }
 
-        async function vote(name) {
-            await fetch(`/vote/${currentSession}/${name}`, {
-                method: 'POST'
-            });
-            loadNames();
-        }
 
         async function loadNames() {
             const response = await fetch(`/names/${currentSession}`);

@@ -17,7 +17,7 @@
 
     - name: Copy our custom Nginx config
       template:
-        src: mysite.conf.j2
+        src: templates/mysite.conf.j2
         dest: /etc/nginx/sites-available/mysite.conf
       notify:
         - Reload Nginx

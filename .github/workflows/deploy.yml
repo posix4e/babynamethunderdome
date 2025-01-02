@@ -21,6 +21,7 @@ jobs:
 
       - name: Run Ansible playbook
         run: |
-          ansible-playbook -i localhost, deploy.yml
+          ansible-playbook -i localhost, deploy.yml --extra-vars "new_relic_license_key=${NEW_RELIC_LICENSE_KEY}"
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
+          NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY}}

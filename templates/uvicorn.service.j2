@@ -1,0 +1,16 @@
+[Unit]
+Description=Uvicorn instance for FastAPI app
+After=network.target
+
+[Service]
+# Use environment variable if needed
+Environment=NEW_RELIC_LICENSE_KEY={{ new_relic_license_key }}
+
+User=posix4e
+Group=posix4e 
+WorkingDirectory={{ project_dir }}
+ExecStart={{ project_dir }}/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

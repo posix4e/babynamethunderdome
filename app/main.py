@@ -6,9 +6,23 @@ from typing import List, Dict, Optional
 import uuid
 import random
 from sqlalchemy.orm import Session
+import newrelic.agent
 from . import database
 
+# Initialize New Relic agent
+newrelic.agent.initialize()
+
+# Create FastAPI app
 app = FastAPI()
+
+# Add New Relic middleware
+@app.middleware("http")
+async def add_new_relic_transaction(request: Request, call_next):
+    transaction = newrelic.agent.current_transaction()
+    if transaction:
+        transaction.set_transaction_name(f"{request.method} {request.url.path}")
+    response = await call_next(request)
+    return response
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")

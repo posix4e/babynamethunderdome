@@ -23,4 +23,5 @@ jobs:
         run: |
           ansible-playbook -i localhost, deploy.yml
         env:
+          NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
           ANSIBLE_HOST_KEY_CHECKING: False

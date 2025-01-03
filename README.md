@@ -18,44 +18,28 @@ A collaborative baby name selection platform that helps parents choose the perfe
 
 ## Quick Start
 
-1. **Installation**
+1. Clone and install:
    ```bash
-   # Clone the repository
    git clone https://github.com/posix4e/babynamethunderdome.git
    cd babynamethunderdome
-
-   # Install dependencies
    pip install -r requirements.txt
    ```
 
-2. **Running Locally**
+2. Run locally:
    ```bash
    python app/main.py
    ```
-   The application will be available at http://localhost:5000
-
-## Development
-
-- **Running Tests**
-  ```bash
-  python -m pytest tests/
-  ```
-
-- **Project Structure**
-  - `app/main.py` - Main application code
-  - `app/static/` - Static assets (CSS, JS)
-  - `app/templates/` - HTML templates
-  - `tests/` - Test suite
-  - `requirements.txt` - Python dependencies
-  - `*.yml/.j2` - Deployment and configuration files
+   Visit http://localhost:5000 in your browser
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Run the tests
+4. Run tests: `python -m pytest tests/`
 5. Submit a pull request
+
+For detailed development guidelines, see [.openhands-instructions](.openhands-instructions).
 
 ## License
 

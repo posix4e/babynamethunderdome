@@ -1,64 +1,55 @@
-# OpenHands Instructions for Baby Name Thunderdome
+# Development Guidelines for Baby Name Thunderdome
 
-## Repository Overview
+## Technical Stack
 
-Baby Name Thunderdome is a Python web application that helps parents choose baby names through collaborative voting. Key aspects:
+- Python/Flask web application
+- SQLite database
+- Link-based authentication
+- GitHub Actions deployment
 
-- Built with Python and Flask
-- Simple authentication model based on shareable links
-- Uses SQLite for data storage
-- Deployed using GitHub Actions
+## Development Requirements
 
-## Development Guidelines
-
-1. **Code Changes**
-   - All Python code changes must include corresponding tests in the `tests/` directory
+1. **Code Standards**
    - Follow PEP 8 style guidelines
-   - Maintain existing code structure and patterns
+   - Write tests for all Python code changes
+   - Maintain existing code patterns and structure
 
-2. **Documentation**
-   - Keep README.md up to date with any new features or changes
-   - Document any new configuration options
-   - Include setup instructions for new dependencies
+2. **Testing Protocol**
+   - Write tests before implementing features
+   - Run `python -m pytest tests/` before committing
+   - All tests must pass before submitting PRs
 
-3. **Testing**
-   - Run `python -m pytest tests/` before submitting changes
-   - Add tests for new features and bug fixes
-   - Ensure all tests pass before committing
-
-4. **Deployment**
-   - Do not edit GitHub workflow files directly
-   - Place any workflow changes in the root directory
-   - Test deployment changes in a staging environment first
-
-5. **Security**
-   - Do not commit sensitive information
+3. **Security Guidelines**
+   - Never commit sensitive information
    - Use environment variables for configuration
-   - Keep dependencies updated
+   - Keep dependencies up to date
+   - Test security-related changes thoroughly
 
-## File Structure
+4. **Deployment Process**
+   - Don't modify GitHub workflow files directly
+   - Test deployment changes in staging first
+   - Keep deployment configuration in root directory
 
-- `app/main.py` - Core application logic
-- `app/static/` - Frontend assets
-- `app/templates/` - HTML templates
-- `tests/` - Test suite
-- `*.yml` - Configuration files
-- `requirements.txt` - Python dependencies
+5. **Documentation**
+   - Update README.md for user-facing changes
+   - Document configuration changes
+   - Maintain clear inline code documentation
 
-## Common Tasks
+## Development Workflow
 
-1. **Adding New Features**
-   - Create tests first
-   - Implement the feature
+1. **New Features**
+   - Write failing tests
+   - Implement feature
    - Update documentation
-   - Run test suite
+   - Verify tests pass
 
 2. **Bug Fixes**
-   - Reproduce the issue with a test
+   - Create test reproducing the issue
    - Fix the bug
-   - Verify the test passes
+   - Verify fix with tests
 
-3. **Documentation Updates**
-   - Keep README.md current
-   - Update inline documentation
-   - Document configuration changes
+3. **Code Review**
+   - Self-review changes
+   - Run full test suite
+   - Update relevant documentation
+   - Submit PR with clear description
